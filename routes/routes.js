@@ -1,5 +1,6 @@
 const express = require('express');
 const Model = require('../model/model')
+const artefact = require('../model/artefact')
 
 const router = express.Router()
 
@@ -24,6 +25,27 @@ router.post('/post', async (req, res) => {
     }
 })
 
+router.post('/postartefact', async (req, res) => { //artefact
+
+    const data = new artefact(
+        {
+            name: req.body.name,
+            description: req.body.description,
+            imageUrl: req.body.imageUrl
+        }
+    )
+
+    try {
+        const dataToSave = data.save();
+        res.status(200).json(dataToSave)
+
+    }
+    catch (error) {
+        res.status(400).json({ message: error.message })
+
+    }
+})
+
 //Get all Method
 router.get('/getAll', async (req, res) => {
     try {
@@ -31,6 +53,15 @@ router.get('/getAll', async (req, res) => {
         res.json(data)
     }
     catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+})
+
+router.get('/getArtefacts', async (req, res) => { //artefact
+    try {
+        const data = await artefact.find();
+        res.json(data);
+    } catch (error) {
         res.status(500).json({ message: error.message })
     }
 })
@@ -74,5 +105,20 @@ router.delete('/delete/:id', async (req, res) => {
         res.status(400).json({ message: error.message })
     }
 })
+
+router.delete('/deleteart/:name', async (req, res) => {
+    try {
+        const name = req.params.name;
+        const data = await artefact.findOneAndDelete({ name: name });
+        if (data) {
+            res.send(`Document with name ${data.name} has been deleted.`);
+        } else {
+            res.status(404).send("Document not found.");
+        }
+    }
+    catch (error) {
+        res.status(400).json({ message: ("param is" + req.params.name) });
+    }
+});
 
 module.exports = router;
