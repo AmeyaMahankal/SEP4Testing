@@ -1,15 +1,35 @@
 const net = require("net");
 const mongoose = require('mongoose')
+const axios = require("axios");
 const mongoString = process.env.DATABASE_URL
 
 const server = net.createServer((socket) => {
     console.log("someone connected :3");
 
-    socket.on("data", (data) => {
+    socket.on("data", async (data) => {
         console.log(`Received from client: ${data.toString()}`);
         //01362410
         //Temp = 24.10
         //humidity = 36%
+
+        receivedData = data.toString();
+
+        const temperature = parseInt(receivedData.substring(4, 6));
+
+        console.log(temperature);
+
+        const endpointurl = ""
+
+        try {
+            const response = await axios.post("http://localhost:3000/api/post", {
+                "name": "plswork",
+                "age": temperature
+            });
+
+            console.log("Data sent to the endpoint:", response.data);
+        } catch (error) {
+            console.error("Error sending data to the endpoint:", error);
+        }
 
 
     });
